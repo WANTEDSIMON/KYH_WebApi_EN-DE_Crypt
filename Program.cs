@@ -1,5 +1,6 @@
 ﻿using System;
 using Key;
+using Password;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
