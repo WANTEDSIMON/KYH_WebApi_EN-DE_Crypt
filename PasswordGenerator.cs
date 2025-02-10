@@ -1,5 +1,7 @@
 using System.Security.Cryptography;
 
+namespace Password
+{
 public static class PasswordGenerator
 {
     private const int DefaultPasswordLength = 12; // Default password length
@@ -30,4 +32,5 @@ public static class PasswordGenerator
         }
         return length;
     }
+}
 }
