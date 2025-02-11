@@ -33,5 +33,30 @@ app.MapGet("/encode", (HttpContext context) =>
     return Results.Text($"Encoded: {encodedText}");
 });
 
+app.MapGet("/decode", (HttpContext context) =>
+{
+    if (!context.Request.Query.TryGetValue("text", out StringValues encodedText) || encodedText.Count == 0 ||
+        !context.Request.Query.TryGetValue("key", out StringValues key) || key.Count == 0)
+    {
+        return Results.BadRequest("Error: Missing 'text' or 'key' parameter. Example: /decode?text=U2VjcmV0S2V5SGVsbG8gd29ybGQ=&key=SecretKey");
+    }
+
+    try
+    {
+        byte[] decodedBytes = Convert.FromBase64String(encodedText.ToString());
+        string decodedText = Encoding.UTF8.GetString(decodedBytes);
+
+        if (decodedText.StartsWith(key.ToString()))
+        {
+            return Results.Text($"Decoded: {decodedText.Substring(key.ToString().Length)}");
+        }
+
+        return Results.BadRequest("Error: Key does not match.");
+    }
+    catch (FormatException)
+    {
+        return Results.BadRequest("Error: Invalid Base64 string.");
+    }
+});
 
 app.Run();
