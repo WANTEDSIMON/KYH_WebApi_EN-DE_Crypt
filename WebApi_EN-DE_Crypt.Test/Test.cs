@@ -16,196 +16,130 @@ using System.Net;
 
 namespace WebApi_EN_DE_Crypt.Test
 {
-    public class UnitTest1
+    // Unit Tests for PasswordGenerator.cs
+    public class PasswordGeneratorTests
     {
-
-// 🔹 Unit Tests for PasswordGenerator.cs
-public class PasswordGeneratorTests
-{
-    [Fact]
-    public void GenerateSecurePassword_ShouldReturnPasswordOfSpecifiedLength()
-    {
-        // Arrange
-        int length = 16;
-
-        // Act
-        string password = PasswordGenerator.GenerateSecurePassword(length);
-
-        // Assert
-        Assert.NotNull(password);
-        Assert.Equal(length, password.Length);
-    }
-
-    [Fact]
-    public void GenerateSecurePassword_ShouldContainValidCharacters()
-    {
-        // Arrange
-        int length = 16;
-        const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+-=[]{}|;:,.<>?";
-
-        // Act
-        string password = PasswordGenerator.GenerateSecurePassword(length);
-
-        // Assert
-        Assert.All(password, c => Assert.Contains(c, validChars));
-    }
-
-    [Fact]
-    public void GetPasswordLength_ShouldReturnDefaultLength_WhenNoQueryParameter()
-    {
-        // Arrange
-        var context = new DefaultHttpContext();
-
-        // Act
-        int length = PasswordGenerator.GetPasswordLength(context);
-
-        // Assert
-        Assert.Equal(12, length);
-    }
-
-    [Fact]
-    public void GetPasswordLength_ShouldReturnCustomLength_WhenQueryParameterIsProvided()
-    {
-        // Arrange
-        var context = new DefaultHttpContext();
-        context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+        [Fact]
+        public void GenerateSecurePassword_ShouldReturnPasswordOfSpecifiedLength()
         {
-            { "length", "20" }
-        });
+            int length = 16;
+            string password = PasswordGenerator.GenerateSecurePassword(length);
+            Assert.NotNull(password);
+            Assert.Equal(length, password.Length);
+        }
 
-        // Act
-        int length = PasswordGenerator.GetPasswordLength(context);
-
-        // Assert
-        Assert.Equal(20, length);
-    }
-
-    [Fact]
-    public void GetPasswordLength_ShouldReturnDefaultLength_WhenQueryParameterIsInvalid()
-    {
-        // Arrange
-        var context = new DefaultHttpContext();
-        context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
+        [Fact]
+        public void GenerateSecurePassword_ShouldContainValidCharacters()
         {
-            { "length", "invalid" }
-        });
+            int length = 16;
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+-=[]{}|;:,.<>?";
+            string password = PasswordGenerator.GenerateSecurePassword(length);
+            Assert.All(password, c => Assert.Contains(c, validChars));
+        }
 
-        // Act
-        int length = PasswordGenerator.GetPasswordLength(context);
+        [Fact]
+        public void GetPasswordLength_ShouldReturnDefaultLength_WhenNoQueryParameter()
+        {
+            var context = new DefaultHttpContext();
+            int length = PasswordGenerator.GetPasswordLength(context);
+            Assert.Equal(12, length);
+        }
 
-        // Assert
-        Assert.Equal(12, length);
+        [Fact]
+        public void GetPasswordLength_ShouldReturnCustomLength_WhenQueryParameterIsProvided()
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Query = new QueryCollection(new Dictionary<string, StringValues> { { "length", "20" } });
+            int length = PasswordGenerator.GetPasswordLength(context);
+            Assert.Equal(20, length);
+        }
+
+        [Fact]
+        public void GetPasswordLength_ShouldReturnDefaultLength_WhenQueryParameterIsInvalid()
+        {
+            var context = new DefaultHttpContext();
+            context.Request.Query = new QueryCollection(new Dictionary<string, StringValues> { { "length", "invalid" } });
+            int length = PasswordGenerator.GetPasswordLength(context);
+            Assert.Equal(12, length);
+        }
     }
-}
 
-// 🔹 Unit Tests for KeyGenerator.cs
-public class KeyGeneratorTests
-{
-    [Fact]
-    public void GenerateRandomKey_ShouldReturnKeyOfSpecifiedLength()
+    // Unit Tests for KeyGenerator.cs
+    public class KeyGeneratorTests
     {
-        // Arrange
-        const int expectedKeyLength = 32;
-
-        // Act
-        string key = KeyGenerator.GenerateRandomKey();
-        byte[] keyBytes = Convert.FromBase64String(key);
-
-        // Assert
-        Assert.NotNull(key);
-        Assert.Equal(expectedKeyLength, keyBytes.Length);
+        [Fact]
+        public void GenerateRandomKey_ShouldReturnKeyOfSpecifiedLength()
+        {
+            const int expectedKeyLength = 32;
+            string key = KeyGenerator.GenerateRandomKey();
+            byte[] keyBytes = Convert.FromBase64String(key);
+            Assert.NotNull(key);
+            Assert.Equal(expectedKeyLength, keyBytes.Length);
+        }
     }
-}
 
-// 🔹 Unit Tests for Program.cs
-public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
-{
-    private readonly WebApplicationFactory<Program> _factory;
-
-    public ProgramTests(WebApplicationFactory<Program> factory)
+    // Unit Tests for Program.cs
+    public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
     {
-        _factory = factory;
-    }
+        private readonly WebApplicationFactory<Program> _factory;
 
-    [Fact]
-    public async Task GetRoot_ShouldReturnHelloEarth()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
+        public ProgramTests(WebApplicationFactory<Program> factory)
+        {
+            _factory = factory;
+        }
 
-        // Act
-        var response = await client.GetAsync("/");
-        var content = await response.Content.ReadAsStringAsync();
+        [Fact]
+        public async Task GetRoot_ShouldReturnHelloEarth()
+        {
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("/");
+            var content = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("Hello Earth 🌎!", content);
+        }
 
-        // Assert
-        response.EnsureSuccessStatusCode();
-        Assert.Equal("Hello Earth 🌎!", content);
-    }
+        [Fact]
+        public async Task GetKey_ShouldReturnRandomKey()
+        {
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("/key");
+            var content = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+            Assert.NotNull(content);
+        }
 
-    [Fact]
-    public async Task GetKey_ShouldReturnRandomKey()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
+        [Fact]
+        public async Task GetPassword_ShouldReturnGeneratedPassword()
+        {
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("/password");
+            var content = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+            Assert.Contains("Generated Password:", content);
+        }
 
-        // Act
-        var response = await client.GetAsync("/key");
-        var content = await response.Content.ReadAsStringAsync();
+        [Fact]
+        public async Task Encode_ShouldReturnEncodedText()
+        {
+            var client = _factory.CreateClient();
+            var text = "HelloWorld";
+            var key = "MyKey";
+            var response = await client.GetAsync($"/encode?text={text}&key={key}");
+            var content = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+            Assert.Contains("Encoded:", content);
+        }
 
-        // Assert
-        response.EnsureSuccessStatusCode();
-        Assert.NotNull(content);
-    }
-
-    [Fact]
-    public async Task GetPassword_ShouldReturnGeneratedPassword()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-
-        // Act
-        var response = await client.GetAsync("/password");
-        var content = await response.Content.ReadAsStringAsync();
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-        Assert.Contains("Generated Password:", content);
-    }
-
-    [Fact]
-    public async Task Encode_ShouldReturnEncodedText()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-        var text = "HelloWorld";
-        var key = "MyKey";
-
-        // Act
-        var response = await client.GetAsync($"/encode?text={text}&key={key}");
-        var content = await response.Content.ReadAsStringAsync();
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-        Assert.Contains("Encoded:", content);
-    }
-
-    [Fact]
-    public async Task Decode_ShouldReturnDecodedText()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-        var text = "U2VjcmV0S2V5SGVsbG8gd29ybGQ=";
-        var key = "SecretKey";
-
-        // Act
-        var response = await client.GetAsync($"/decode?text={text}&key={key}");
-        var content = await response.Content.ReadAsStringAsync();
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-        Assert.Contains("Decoded:", content);
-    }
-}
-
+        [Fact]
+        public async Task Decode_ShouldReturnDecodedText()
+        {
+            var client = _factory.CreateClient();
+            var text = "U2VjcmV0S2V5SGVsbG8gd29ybGQ=";
+            var key = "SecretKey";
+            var response = await client.GetAsync($"/decode?text={text}&key={key}");
+            var content = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+            Assert.Contains("Decoded:", content);
+        }
     }
 }
