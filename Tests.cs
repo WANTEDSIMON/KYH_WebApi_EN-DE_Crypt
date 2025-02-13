@@ -1,17 +1,22 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Collections.Generic; // ✅ Added for Dictionary<>
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Password;
 using Xunit;
 using Key;
-using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
+using System.Net;
 
-// Test for PasswordGenerator
+// ✅ Ensure `Program` is public or has `InternalsVisibleTo` in `AssemblyInfo.cs`
+
+// 🔹 Unit Tests for PasswordGenerator.cs
 public class PasswordGeneratorTests
 {
     [Fact]
@@ -90,7 +95,7 @@ public class PasswordGeneratorTests
     }
 }
 
-// Unit Tests for KeyGenerator.cs
+// 🔹 Unit Tests for KeyGenerator.cs
 public class KeyGeneratorTests
 {
     [Fact]
@@ -109,7 +114,7 @@ public class KeyGeneratorTests
     }
 }
 
-// Unit Tests for Program.cs
+// 🔹 Unit Tests for Program.cs
 public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
