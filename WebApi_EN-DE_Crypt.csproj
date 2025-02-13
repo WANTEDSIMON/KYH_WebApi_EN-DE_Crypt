@@ -7,4 +7,11 @@
     <RootNamespace>WebApi_EN_DE_Crypt</RootNamespace>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Moq" Version="4.16.1" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
+	</ItemGroup>
+	
 </Project>
