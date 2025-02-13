@@ -2,8 +2,10 @@ name: Run Projekt Test
 on:
   push:
     branches: 
-    - main
+    - '*Test*'
   pull_request:
+    branches:
+    - '*Test*'
 
 
 
