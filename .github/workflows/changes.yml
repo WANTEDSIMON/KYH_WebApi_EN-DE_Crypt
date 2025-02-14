@@ -1,0 +1,26 @@
+name: 🔄 Changes Branch - CI Check
+
+on:
+  push:
+    branches:
+      - changes  # Matches exact "changes"
+      - changes_*  # Matches any branch that starts with "changes_"
+    paths:
+      - "README.md"  # Only runs if README.md is modified
+  pull_request:
+    branches:
+      - changes
+      - changes_*  # Matches branches like "changes_1", "changes_2"
+    paths:
+      - "README.md"
+
+jobs:
+  check-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🛠️ Checkout repository
+      uses: actions/checkout@v3
+
+    - name: ✅ Validate Markdown (README.md)
+      run: echo "Markdown validation would be done here"
