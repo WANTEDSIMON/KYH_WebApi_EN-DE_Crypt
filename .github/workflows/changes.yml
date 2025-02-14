@@ -3,14 +3,22 @@ name: 🔄 Changes Branch - CI Check
 on:
   push:
     branches:
-      - changes  # Matches exact "changes"
-      - changes_*  # Matches any branch that starts with "changes_"
+      - Changes
+      - changes
+      - Changes_*
+      - changes_*
+      - Changes.*
+      - changes.*
     paths:
       - "README.md"  # Only runs if README.md is modified
   pull_request:
     branches:
+      - Changes
       - changes
-      - changes_*  # Matches branches like "changes_1", "changes_2"
+      - Changes_*
+      - changes_*
+      - Changes.*
+      - changes.*
     paths:
       - "README.md"
 
